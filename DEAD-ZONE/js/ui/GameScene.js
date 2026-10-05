@@ -128,6 +128,7 @@ export class GameScene extends Scene {
     this._hudLevel     = document.getElementById('hud-level');
     this._hudAmmoCur   = document.getElementById('hud-ammo-cur');
     this._hudAmmoMax   = document.getElementById('hud-ammo-max');
+    this._hudAmmoBox   = document.getElementById('hud-ammo-box');
     this._hudWave      = document.getElementById('hud-wave');
     this._hudCoin      = document.getElementById('hud-coin');
 
@@ -394,7 +395,11 @@ export class GameScene extends Scene {
       } else if (p.ammo <= 0) {
         if (input.isPressed('shoot')) {
           sound.playEmptyMag();
-          if (p.reserveAmmo > 0) this._startReload();
+          if (p.reserveAmmo > 0) {
+            this._startReload();
+          } else {
+            this._createDamageText(p.x, p.y - 25, 'HẾT ĐẠN! TÌM HỘP TIẾP ĐẠN', '#fb923c', 0.7);
+          }
         }
       } else if (p.fireTimer <= 0) {
         this._shoot();
@@ -850,6 +855,24 @@ export class GameScene extends Scene {
       coinItem.init(z.x, z.y, 'COIN', z.type === 'TANK' ? 3 : 1);
     }
 
+    // Rơi Hộp Tiếp Đạn (AMMO CRATE) - Tỉ lệ thích ứng: tăng cao nếu người chơi sắp hết đạn
+    const isLowAmmo = this._player.reserveAmmo < 40;
+    const ammoChance = z.type === 'TANK' ? 0.8 : (isLowAmmo ? 0.45 : 0.20);
+    if (Math.random() < ammoChance) {
+      const ammoItem = this._pickupPool.get();
+      const ammoAmount = z.type === 'TANK' ? 60 : 35;
+      ammoItem.init(z.x, z.y, 'AMMO', ammoAmount);
+    }
+
+    // Rơi Hộp Cứu Thương (MEDKIT) - Tỉ lệ thích ứng: tăng cao nếu máu người chơi < 50%
+    const isLowHp = this._player.hp < (this._player.maxHp * 0.55);
+    const medkitChance = z.type === 'TANK' ? 0.35 : (isLowHp ? 0.22 : 0.08);
+    if (Math.random() < medkitChance) {
+      const medItem = this._pickupPool.get();
+      const healAmount = z.type === 'TANK' ? 35 : 25;
+      medItem.init(z.x, z.y, 'MEDKIT', healAmount);
+    }
+
     this._zombiePool.release(z);
   }
 
@@ -866,6 +889,16 @@ export class GameScene extends Scene {
     for (let i = 0; i < 8; i++) {
       const coinItem = this._pickupPool.get();
       coinItem.init(this._boss.x, this._boss.y, 'COIN', 2);
+    }
+
+    // Boss rơi kho tiếp tế khổng lồ: 3 Hộp Đạn lớn + 2 Hộp Cứu Thương
+    for (let i = 0; i < 3; i++) {
+      const ammoItem = this._pickupPool.get();
+      ammoItem.init(this._boss.x, this._boss.y, 'AMMO', 50);
+    }
+    for (let i = 0; i < 2; i++) {
+      const medItem = this._pickupPool.get();
+      medItem.init(this._boss.x, this._boss.y, 'MEDKIT', 40);
     }
 
     this._bossBarContainer?.classList.add('boss-bar--hidden');
@@ -888,10 +921,24 @@ export class GameScene extends Scene {
         sound.playLevelUp();
         this._showLevelUpModal();
       }
-    } else {
+    } else if (item.type === 'COIN') {
       p.coins += item.value;
       sound.playPickupCoin();
       this._createDamageText(item.x, item.y, `+${item.value} ◈`, '#facc15', 0.65);
+    } else if (item.type === 'AMMO') {
+      p.reserveAmmo += item.value;
+      sound.playPickupAmmo();
+      this._createDamageText(item.x, item.y, `+${item.value} ĐẠN`, '#fb923c', 0.85);
+
+      // Nếu đang hết đạn và không đang nạp, kích hoạt nạp đạn ngay lập tức
+      if (p.ammo <= 0 && !p.isReloading) {
+        this._startReload();
+      }
+    } else if (item.type === 'MEDKIT') {
+      const actualHealed = Math.min(p.maxHp - p.hp, item.value);
+      p.hp = Math.min(p.maxHp, p.hp + item.value);
+      sound.playPickupMedkit();
+      this._createDamageText(item.x, item.y, `+${Math.round(actualHealed > 0 ? actualHealed : item.value)} HP`, '#22c55e', 0.9);
     }
 
     this._updateHUD();
@@ -999,6 +1046,13 @@ export class GameScene extends Scene {
     }
     if (this._hudAmmoMax) {
       this._hudAmmoMax.textContent = `${p.reserveAmmo}`;
+    }
+    if (this._hudAmmoBox) {
+      if (p.reserveAmmo <= 0 && p.ammo <= 0) {
+        this._hudAmmoBox.classList.add('hud__ammo--empty');
+      } else {
+        this._hudAmmoBox.classList.remove('hud__ammo--empty');
+      }
     }
     if (this._hudWave) {
       this._hudWave.textContent = `${this._waveManager.currentWave}`;

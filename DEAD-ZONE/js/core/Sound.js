@@ -258,6 +258,57 @@ class SoundManager {
     osc.stop(now + 0.12);
   }
 
+  /** Tiếng nhặt hộp đạn AMMO (Lách cách nạp băng đạn) */
+  playPickupAmmo() {
+    if (!this.enabled) return;
+    this._initContext();
+    if (!this._ctx) return;
+
+    const ctx = this._ctx;
+    const now = ctx.currentTime;
+
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(320, now);
+    osc.frequency.exponentialRampToValueAtTime(780, now + 0.08);
+
+    gain.gain.setValueAtTime(0.16, now);
+    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.1);
+  }
+
+  /** Tiếng nhặt hộp cứu thương MEDKIT (Chime hồi máu trong trẻo) */
+  playPickupMedkit() {
+    if (!this.enabled) return;
+    this._initContext();
+    if (!this._ctx) return;
+
+    const ctx = this._ctx;
+    const now = ctx.currentTime;
+
+    [523.25, 659.25, 783.99].forEach((freq, idx) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      const t = now + idx * 0.05;
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, t);
+
+      gain.gain.setValueAtTime(0, now);
+      gain.gain.setValueAtTime(0.14, t);
+      gain.gain.exponentialRampToValueAtTime(0.01, t + 0.15);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(t);
+      osc.stop(t + 0.15);
+    });
+  }
+
   /** Tiếng Level Up (Fanfare chúc mừng) */
   playLevelUp() {
     if (!this.enabled) return;

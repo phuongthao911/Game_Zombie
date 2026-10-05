@@ -29,7 +29,11 @@ export class Pickup {
 
     this.type = type;
     this.value = value;
-    this.radius = type === 'COIN' ? 6.5 : 5.5;
+    if (type === 'COIN') this.radius = 6.5;
+    else if (type === 'AMMO') this.radius = 8.5;
+    else if (type === 'MEDKIT') this.radius = 9.0;
+    else this.radius = 5.5; // EXP
+
     this.alive = true;
     this.life = 0;
     this.isHoming = false;
@@ -90,7 +94,7 @@ export class Pickup {
       ctx.beginPath();
       ctx.arc(this.x, this.y, r * 0.45, 0, Math.PI * 2);
       ctx.fill();
-    } else {
+    } else if (this.type === 'COIN') {
       // Đồng tiền Coin vàng óng
       ctx.shadowBlur = 12;
       ctx.shadowColor = '#eab308';
@@ -114,6 +118,55 @@ export class Pickup {
       ctx.beginPath();
       ctx.arc(0, 0, r * 0.4, 0, Math.PI * 2);
       ctx.fill();
+
+      ctx.restore();
+    } else if (this.type === 'AMMO') {
+      // Hộp đạn quân sự (Màu vàng cam Amber phát sáng)
+      ctx.shadowBlur = 14;
+      ctx.shadowColor = '#fb923c';
+
+      ctx.save();
+      ctx.translate(this.x, this.y);
+
+      // Vỏ hộp đạn kim loại màu xanh olive / cam
+      ctx.fillStyle = '#1c1917';
+      ctx.strokeStyle = '#fb923c';
+      ctx.lineWidth = 1.8;
+      ctx.beginPath();
+      ctx.roundRect(-r * 0.9, -r * 0.65, r * 1.8, r * 1.3, 3);
+      ctx.fill();
+      ctx.stroke();
+
+      // 3 khấc đạn vàng bên trong
+      ctx.fillStyle = '#fb923c';
+      for (let i = -1; i <= 1; i++) {
+        ctx.fillRect(i * (r * 0.45) - 1.5, -r * 0.35, 3, r * 0.7);
+      }
+
+      ctx.restore();
+    } else if (this.type === 'MEDKIT') {
+      // Hộp cứu thương y tế (Trắng phát sáng viền đỏ/xanh lá, chữ thập đỏ)
+      ctx.shadowBlur = 16;
+      ctx.shadowColor = '#22c55e';
+
+      ctx.save();
+      ctx.translate(this.x, this.y);
+
+      // Hộp cứu thương trắng
+      ctx.fillStyle = '#ffffff';
+      ctx.strokeStyle = '#22c55e';
+      ctx.lineWidth = 1.8;
+      ctx.beginPath();
+      ctx.roundRect(-r * 0.95, -r * 0.8, r * 1.9, r * 1.6, 3);
+      ctx.fill();
+      ctx.stroke();
+
+      // Chữ thập đỏ y tế
+      ctx.fillStyle = '#ef4444';
+      const crossW = r * 0.4;
+      const crossL = r * 0.9;
+      ctx.fillRect(-crossL * 0.5, -crossW * 0.5, crossL, crossW);
+      ctx.fillRect(-crossW * 0.5, -crossL * 0.5, crossW, crossL);
 
       ctx.restore();
     }

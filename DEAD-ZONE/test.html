@@ -481,13 +481,25 @@
     }).then(({ Pickup }) => {
 
       // ---- Pickup Tests ----
-      suite('Pickup Entity (Phase 3)', () => {
-        test('init creates EXP and Coin pickups', () => {
+      suite('Pickup Entity (Phase 3 & 5)', () => {
+        test('init creates EXP, Coin, AMMO and MEDKIT pickups', () => {
           const p = new Pickup();
           p.init(100, 100, 'EXP', 10);
           assertEqual(p.alive, true);
           assertEqual(p.type, 'EXP');
           assertEqual(p.value, 10);
+
+          const ammo = new Pickup();
+          ammo.init(100, 100, 'AMMO', 40);
+          assertEqual(ammo.type, 'AMMO');
+          assertEqual(ammo.value, 40);
+          assertEqual(ammo.radius, 8.5);
+
+          const med = new Pickup();
+          med.init(100, 100, 'MEDKIT', 25);
+          assertEqual(med.type, 'MEDKIT');
+          assertEqual(med.value, 25);
+          assertEqual(med.radius, 9.0);
         });
 
         test('pickup flies toward player within magnet radius', () => {
