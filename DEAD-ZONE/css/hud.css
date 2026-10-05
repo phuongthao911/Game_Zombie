@@ -1,0 +1,177 @@
+/* ============================================================
+   DEAD ZONE: SURVIVAL — HUD Styles
+   ============================================================ */
+
+.hud {
+  position: absolute;
+  inset: 0;
+  z-index: var(--z-hud);
+  pointer-events: none;
+  font-family: var(--font-primary);
+  padding: var(--sp-4);
+  transition: opacity var(--dur-normal);
+}
+
+.hud--hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ---- Top Row layout ---- */
+.hud__top-left,
+.hud__top-center,
+.hud__top-right {
+  position: absolute;
+  top: var(--sp-4);
+}
+
+.hud__top-left  { left: var(--sp-4); }
+.hud__top-center { left: 50%; transform: translateX(-50%); text-align: center; }
+.hud__top-right  { right: var(--sp-4); text-align: right; }
+
+/* ---- HP / EXP bars ---- */
+.hud__hp-bar,
+.hud__exp-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  margin-bottom: var(--sp-1);
+}
+
+.hud__label {
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--clr-text-muted);
+  min-width: 28px;
+}
+
+.hud__bar-track {
+  width: 140px;
+  height: 6px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 3px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.06);
+}
+
+.hud__bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.25s var(--ease-out);
+}
+
+.hud__bar-fill--hp {
+  background: linear-gradient(90deg, var(--clr-green-dim), var(--clr-green));
+  box-shadow: var(--glow-green);
+  width: 100%;
+}
+
+.hud__bar-fill--exp {
+  background: linear-gradient(90deg, var(--clr-blue-dim), var(--clr-blue));
+  box-shadow: var(--glow-blue);
+  width: 0%;
+}
+
+.hud__value {
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  color: var(--clr-text);
+  min-width: 36px;
+  font-family: var(--font-mono);
+}
+
+/* ---- Wave counter ---- */
+.hud__wave {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.hud__wave .hud__label {
+  font-size: var(--fs-xs);
+  letter-spacing: 4px;
+}
+
+.hud__wave-number {
+  font-size: var(--fs-2xl);
+  font-weight: 700;
+  color: var(--clr-primary);
+  line-height: 1;
+  text-shadow: var(--glow-primary);
+  font-family: var(--font-mono);
+}
+
+/* ---- Ammo ---- */
+.hud__ammo {
+  font-family: var(--font-mono);
+  margin-bottom: var(--sp-1);
+}
+
+.hud__ammo-cur {
+  font-size: var(--fs-xl);
+  font-weight: 700;
+  color: var(--clr-text);
+}
+
+.hud__ammo-sep {
+  font-size: var(--fs-sm);
+  color: var(--clr-text-muted);
+  margin: 0 var(--sp-1);
+}
+
+.hud__ammo-max {
+  font-size: var(--fs-sm);
+  color: var(--clr-text-muted);
+}
+
+/* ---- Coin ---- */
+.hud__coin {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--sp-1);
+}
+
+.hud__coin-icon {
+  color: var(--clr-yellow);
+  font-size: var(--fs-sm);
+}
+
+/* ---- Skill Bar ---- */
+.hud__skill-bar {
+  position: absolute;
+  bottom: var(--sp-6);
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: var(--sp-3);
+}
+
+.hud__skill {
+  position: relative;
+  width: 52px;
+  height: 52px;
+  border: 2px solid var(--clr-border);
+  border-radius: var(--radius-md);
+  background: rgba(20,20,31,0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+}
+
+.hud__skill-icon {
+  font-size: 1.5rem;
+  z-index: 1;
+}
+
+.hud__skill-cooldown {
+  position: absolute;
+  inset: 0;
+  border-radius: calc(var(--radius-md) - 2px);
+  background: rgba(0,0,0,0.7);
+  transform-origin: bottom;
+  transform: scaleY(0);
+  transition: transform 0.1s linear;
+}

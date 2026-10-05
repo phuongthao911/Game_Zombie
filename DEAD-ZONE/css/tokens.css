@@ -1,0 +1,197 @@
+/* ============================================================
+   DEAD ZONE: SURVIVAL — Design Tokens
+   Toàn bộ màu sắc, khoảng cách, font, shadow dùng chung
+   cho cả CSS lẫn JS (via CSS custom properties)
+   ============================================================ */
+
+:root {
+  /* --- Palette --- */
+  --clr-bg:          #0a0a0f;
+  --clr-bg-alt:      #10101a;
+  --clr-surface:     #14141f;
+  --clr-surface-2:   #1c1c2e;
+  --clr-border:      #2a2a40;
+
+  --clr-primary:     #e63333;   /* blood red */
+  --clr-primary-glow:#ff4444;
+  --clr-primary-dim: #8b1a1a;
+
+  --clr-accent:      #ff8c00;   /* warning orange */
+  --clr-accent-glow: #ffa040;
+
+  --clr-green:       #22c55e;   /* health */
+  --clr-green-dim:   #15803d;
+
+  --clr-blue:        #38bdf8;   /* ammo/exp */
+  --clr-blue-dim:    #0369a1;
+
+  --clr-yellow:      #facc15;   /* coin */
+  --clr-purple:      #a855f7;   /* legendary */
+
+  --clr-text:        #e8e8f0;
+  --clr-text-muted:  #6b7080;
+  --clr-text-dim:    #3a3a50;
+
+  /* --- Typography --- */
+  --font-primary: 'Rajdhani', 'Arial Narrow', sans-serif;
+  --font-mono:    'Share Tech Mono', 'Courier New', monospace;
+
+  --fs-xs:  0.65rem;
+  --fs-sm:  0.8rem;
+  --fs-md:  1rem;
+  --fs-lg:  1.25rem;
+  --fs-xl:  1.75rem;
+  --fs-2xl: 2.5rem;
+  --fs-3xl: 4rem;
+
+  /* --- Spacing --- */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-6: 24px;
+  --sp-8: 32px;
+
+  /* --- Borders / Radius --- */
+  --radius-sm: 3px;
+  --radius-md: 6px;
+  --radius-lg: 12px;
+  --border-width: 1px;
+
+  /* --- Shadows / Glows --- */
+  --glow-primary:  0 0 8px var(--clr-primary), 0 0 24px rgba(230,51,51,0.35);
+  --glow-accent:   0 0 8px var(--clr-accent),  0 0 24px rgba(255,140,0,0.35);
+  --glow-green:    0 0 8px var(--clr-green),   0 0 20px rgba(34,197,94,0.30);
+  --glow-blue:     0 0 8px var(--clr-blue),    0 0 20px rgba(56,189,248,0.30);
+
+  --shadow-card: 0 4px 24px rgba(0,0,0,0.6), 0 1px 4px rgba(0,0,0,0.8);
+
+  /* --- Transitions --- */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur-fast:   120ms;
+  --dur-normal: 250ms;
+  --dur-slow:   500ms;
+
+  /* --- Z-index layers --- */
+  --z-canvas:  0;
+  --z-hud:    10;
+  --z-screen: 20;
+  --z-debug:  99;
+}
+
+/* ---- Reset ---- */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--clr-bg);
+  color: var(--clr-text);
+  font-family: var(--font-primary);
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+}
+
+#app {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ---- Screen base ---- */
+.screen {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: var(--z-screen);
+  transition: opacity var(--dur-slow) var(--ease-out),
+              transform var(--dur-slow) var(--ease-out);
+}
+
+.screen--active {
+  opacity: 1;
+  pointer-events: all;
+  transform: translateY(0);
+}
+
+.screen--hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(8px);
+}
+
+/* ---- Game container ---- */
+#game-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+#game-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: var(--clr-bg);
+}
+
+/* ---- Loading Screen ---- */
+#screen-loading {
+  background: var(--clr-bg);
+  flex-direction: column;
+  gap: var(--sp-8);
+}
+
+.loading-logo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-4);
+}
+
+.logo-ring {
+  animation: spin 8s linear infinite;
+  transform-origin: 60px 60px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-text {
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm);
+  color: var(--clr-text-muted);
+  letter-spacing: 4px;
+  animation: blink 1.2s ease-in-out infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
+.loading-bar {
+  width: 200px;
+  height: 2px;
+  background: var(--clr-border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.loading-bar__fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--clr-primary-dim), var(--clr-primary));
+  border-radius: 2px;
+  width: 0%;
+  transition: width 0.3s var(--ease-out);
+  box-shadow: var(--glow-primary);
+}

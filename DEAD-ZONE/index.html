@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Dead Zone: Survival - 2D top-down zombie survival game. Fight waves of zombies, level up, and survive as long as you can." />
+  <title>Dead Zone: Survival</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/tokens.css" />
+  <link rel="stylesheet" href="css/menu.css" />
+  <link rel="stylesheet" href="css/hud.css" />
+  <link rel="stylesheet" href="css/ui.css" />
+</head>
+<body>
+  <div id="app">
+    <!-- Loading Screen -->
+    <div id="screen-loading" class="screen screen--active">
+      <div class="loading-logo">
+        <svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="60" cy="60" r="55" stroke="#ff3333" stroke-width="2" stroke-dasharray="8 4" class="logo-ring"/>
+          <text x="60" y="52" text-anchor="middle" fill="#ff3333" font-family="Rajdhani" font-size="14" font-weight="700" letter-spacing="3">DEAD</text>
+          <text x="60" y="70" text-anchor="middle" fill="#ff3333" font-family="Rajdhani" font-size="14" font-weight="700" letter-spacing="3">ZONE</text>
+          <circle cx="60" cy="82" r="3" fill="#ff3333"/>
+        </svg>
+        <p class="loading-text">INITIALIZING...</p>
+        <div class="loading-bar"><div id="loading-progress" class="loading-bar__fill"></div></div>
+      </div>
+    </div>
+
+    <!-- Game Canvas Container -->
+    <div id="game-container">
+      <canvas id="game-canvas"></canvas>
+
+      <!-- HUD Layer (overlaid on canvas) -->
+      <div id="hud" class="hud hud--hidden">
+        <div class="hud__top-left">
+          <div class="hud__hp-bar">
+            <span class="hud__label">HP</span>
+            <div class="hud__bar-track">
+              <div id="hud-hp" class="hud__bar-fill hud__bar-fill--hp"></div>
+            </div>
+            <span id="hud-hp-text" class="hud__value">100</span>
+          </div>
+          <div class="hud__exp-bar">
+            <span class="hud__label">EXP</span>
+            <div class="hud__bar-track">
+              <div id="hud-exp" class="hud__bar-fill hud__bar-fill--exp"></div>
+            </div>
+            <span id="hud-level" class="hud__value">Lv.1</span>
+          </div>
+        </div>
+
+        <div class="hud__top-center">
+          <div class="hud__wave">
+            <span class="hud__label">WAVE</span>
+            <span id="hud-wave" class="hud__wave-number">1</span>
+          </div>
+        </div>
+
+        <div class="hud__top-right">
+          <div class="hud__ammo">
+            <span id="hud-ammo-cur" class="hud__ammo-cur">30</span>
+            <span class="hud__ammo-sep">/</span>
+            <span id="hud-ammo-max" class="hud__ammo-max">90</span>
+          </div>
+          <div class="hud__coin">
+            <span class="hud__coin-icon">◈</span>
+            <span id="hud-coin" class="hud__value">0</span>
+          </div>
+        </div>
+
+        <div class="hud__skill-bar">
+          <div class="hud__skill" id="hud-skill-1">
+            <div class="hud__skill-icon">⚡</div>
+            <div class="hud__skill-cooldown" id="skill-cd-1"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Wave Banner Announcement -->
+      <div id="wave-banner" class="wave-banner wave-banner--hidden">
+        <div id="wave-banner-text" class="wave-banner__text">WAVE 1 BẮT ĐẦU!</div>
+      </div>
+
+      <!-- Debug Overlay (toggled by F1) -->
+      <div id="debug-overlay" class="debug-overlay debug-overlay--hidden">
+        <div id="debug-content"></div>
+      </div>
+    </div>
+
+    <!-- Menu Screen -->
+    <div id="screen-menu" class="screen screen--hidden">
+      <div class="menu__bg-canvas">
+        <canvas id="menu-bg-canvas"></canvas>
+      </div>
+      <div class="menu__content">
+        <div class="menu__logo">
+          <h1 class="menu__title">DEAD ZONE</h1>
+          <p class="menu__subtitle">SURVIVAL</p>
+        </div>
+        <nav class="menu__nav" role="navigation" aria-label="Main Menu">
+          <button id="btn-play" class="menu__btn menu__btn--primary" autofocus>CHƠI NGAY</button>
+          <button id="btn-settings" class="menu__btn">CÀI ĐẶT</button>
+          <button id="btn-credits" class="menu__btn">CREDITS</button>
+        </nav>
+        <div class="menu__version">v0.4.0 — Phase 3 &amp; 4 (Wave, Perks &amp; World)</div>
+      </div>
+    </div>
+
+    <!-- Upgrade Screen (Level Up Modal) -->
+    <div id="screen-upgrade" class="screen screen--hidden">
+      <div class="upgrade__backdrop"></div>
+      <div class="upgrade__content">
+        <div class="upgrade__header">
+          <div class="upgrade__badge">LEVEL UP!</div>
+          <h2 class="upgrade__title">CHỌN 1 NÂNG CẤP</h2>
+          <p class="upgrade__subtitle">Tăng cường sức mạnh để tiếp tục sinh tồn</p>
+        </div>
+        <div id="upgrade-cards" class="upgrade__cards">
+          <!-- Cards populated dynamically -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Game Over Screen -->
+    <div id="screen-gameover" class="screen screen--hidden">
+      <div class="gameover__content">
+        <h2 class="gameover__title">GAME OVER</h2>
+        <div class="gameover__stats">
+          <div class="gameover__stat"><span>Wave đạt được</span><span id="go-wave">0</span></div>
+          <div class="gameover__stat"><span>Zombie tiêu diệt</span><span id="go-kills">0</span></div>
+          <div class="gameover__stat"><span>Thời gian</span><span id="go-time">0:00</span></div>
+        </div>
+        <div class="gameover__actions">
+          <button id="btn-retry" class="menu__btn menu__btn--primary">CHƠI LẠI</button>
+          <button id="btn-menu" class="menu__btn">MENU</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pause Screen -->
+    <div id="screen-pause" class="screen screen--hidden">
+      <div class="pause__content">
+        <h2 class="pause__title">TẠM DỪNG</h2>
+        <button id="btn-resume" class="menu__btn menu__btn--primary">TIẾP TỤC</button>
+        <button id="btn-pause-menu" class="menu__btn">MENU CHÍNH</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
