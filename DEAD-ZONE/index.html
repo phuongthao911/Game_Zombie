@@ -70,10 +70,36 @@
           </div>
         </div>
 
+        <!-- Boss Health Bar -->
+        <div id="boss-bar-container" class="boss-bar-container boss-bar--hidden">
+          <div class="boss-bar__header">
+            <span class="boss-bar__name">💀 THE BUTCHER</span>
+            <span id="boss-hp-text" class="boss-bar__hp-text">1200 / 1200</span>
+          </div>
+          <div class="boss-bar__track">
+            <div id="boss-hp-fill" class="boss-bar__fill"></div>
+          </div>
+        </div>
+
+        <!-- Weapon Selector Bar -->
+        <div class="hud__weapon-bar">
+          <div class="hud__weapon-slot hud__weapon-slot--active" id="wslot-1"><span class="hud__weapon-slot-key">[1]</span> 🔫 Pistol</div>
+          <div class="hud__weapon-slot" id="wslot-2"><span class="hud__weapon-slot-key">[2]</span> 💥 Shotgun</div>
+          <div class="hud__weapon-slot" id="wslot-3"><span class="hud__weapon-slot-key">[3]</span> ⚡ SMG</div>
+          <div class="hud__weapon-slot" id="wslot-4"><span class="hud__weapon-slot-key">[4]</span> 🎯 Sniper</div>
+        </div>
+
+        <!-- Skills Bar -->
         <div class="hud__skill-bar">
-          <div class="hud__skill" id="hud-skill-1">
-            <div class="hud__skill-icon">⚡</div>
-            <div class="hud__skill-cooldown" id="skill-cd-1"></div>
+          <div class="hud__skill" id="hud-skill-dash" title="Dash Lướt Nhanh [Space]">
+            <div class="hud__skill-icon">💨</div>
+            <div class="hud__skill-cooldown" id="skill-cd-dash"></div>
+            <div class="hud__skill-key">SPC</div>
+          </div>
+          <div class="hud__skill" id="hud-skill-grenade" title="Ném Lựu Đạn [Q]">
+            <div class="hud__skill-icon">💣</div>
+            <div class="hud__skill-cooldown" id="skill-cd-grenade"></div>
+            <div class="hud__skill-key">Q</div>
           </div>
         </div>
       </div>
@@ -104,7 +130,7 @@
           <button id="btn-settings" class="menu__btn">CÀI ĐẶT</button>
           <button id="btn-credits" class="menu__btn">CREDITS</button>
         </nav>
-        <div class="menu__version">v0.4.0 — Phase 3 &amp; 4 (Wave, Perks &amp; World)</div>
+        <div class="menu__version">v0.7.0 — Phase 5, 6 &amp; 7 (Boss, Weapons &amp; Skills)</div>
       </div>
     </div>
 

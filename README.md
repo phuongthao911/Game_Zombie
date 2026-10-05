@@ -1,4 +1,4 @@
-# Dead Zone: Survival (v0.4.0)
+# Dead Zone: Survival (v0.7.0)
 
 **2D Top-Down Zombie Survival Game** — HTML5 Canvas + JavaScript ES Modules + Web Audio API.  
 Chạy hoàn toàn trên trình duyệt, không cần build tool, không thư viện ngoài.
@@ -22,8 +22,11 @@ Mở `DEAD-ZONE/test.html` với Live Server: `http://127.0.0.1:5500/test.html`
 | Phím / Chuột | Hành động |
 |--------------|-----------|
 | **W A S D** / Mũi tên | Di chuyển nhân vật 8 hướng |
-| **Chuột** | Ngắm / Hướng nhìn |
-| **Chuột trái** (Giữ/Click) | Bắn súng (Pistol) |
+| **Chuột** | Ngắm / Hướng nhìn con trỏ |
+| **Chuột trái** (Giữ/Click) | Bắn súng (Pistol, Shotgun, SMG, Sniper) |
+| **1 / 2 / 3 / 4** | Đổi vũ khí: `[1]` Pistol, `[2]` Shotgun, `[3]` SMG, `[4]` Sniper |
+| **Space** / Shift | Kỹ năng **Dash** lướt nhanh né đòn (Kháng sát thương trong lúc lướt) |
+| **Q** / G | Kỹ năng **Ném Lựu Đạn** nổ diện rộng AOE |
 | **R** | Nạp đạn (Reload) |
 | **F1** | Bật / Tắt Debug Overlay (FPS, UPS, Hitbox) |
 | **Escape / P** | Tạm dừng (Pause Menu) |
@@ -36,12 +39,12 @@ Mở `DEAD-ZONE/test.html` với Live Server: `http://127.0.0.1:5500/test.html`
 Game_Zombie/
 ├── Plan_Dead_Zone_Ultimate.docx  ← Kế hoạch phát triển chi tiết 16 Phase
 └── DEAD-ZONE/
-    ├── index.html                ← Game chính (Canvas + HUD)
+    ├── index.html                ← Game chính (Canvas + HUD + Boss Bar)
     ├── test.html                 ← Unit test runner (100% Pass)
     ├── css/
     │   ├── tokens.css            ← Design tokens & reset
     │   ├── menu.css              ← Menu, pause, game over, upgrade modal
-    │   ├── hud.css               ← HUD in-game (HP, EXP, Wave, Ammo, Coin)
+    │   ├── hud.css               ← HUD in-game (HP, EXP, Boss bar, Skills, Weapons)
     │   └── ui.css                ← Debug overlay, toast, tooltip
     └── js/
         ├── main.js               ← Entry point & lifecycle
@@ -49,22 +52,26 @@ Game_Zombie/
         │   ├── GameLoop.js       ← Fixed timestep loop (60 UPS)
         │   ├── Scene.js          ← State Machine chuyển cảnh
         │   ├── Camera.js         ← Follow player, lerp, trauma shake
-        │   ├── Input.js          ← Keyboard, mouse, gamepad
+        │   ├── Input.js          ← Keyboard, mouse, gamepad, weapon/skill hotkeys
         │   ├── EventBus.js       ← Pub/sub toàn cục
         │   ├── RNG.js            ← Mulberry32 seeded random
         │   ├── Pool.js           ← Object pool (tránh GC)
-        │   └── Sound.js          ← Web Audio procedural synthesizer
+        │   └── Sound.js          ← Web Audio procedural synthesizer (Súng, Nổ, Roar)
         ├── data/
+        │   ├── weapons.js        ← Kho vũ khí (Pistol, Shotgun, SMG, Sniper)
         │   └── perks.js          ← Danh mục 9 Perk nâng cấp Level Up
         ├── entities/
         │   ├── Bullet.js         ← Thực thể đạn
-        │   ├── Zombie.js         ← Zombie đuổi theo, knockback, hit-flash
+        │   ├── Zombie.js         ← 5 Loại Zombie (Normal, Runner, Tank, Bomber, Spitter)
+        │   ├── Boss.js           ← Boss The Butcher (Phase 2 enrage, Telegraph cleave & rush)
+        │   ├── Grenade.js        ← Lựu đạn ném nổ chậm AOE
+        │   ├── AcidSpit.js       ← Đạn dịch độc của Spitter
         │   ├── Pickup.js         ← Ngọc EXP & Tiền xu Coin (Magnet physics)
-        │   ├── Particle.js       ← Hạt máu, tia lửa súng
+        │   ├── Particle.js       ← Hạt máu, tia lửa súng, vụ nổ
         │   └── DamageText.js     ← Số sát thương nổi
         ├── systems/
         │   ├── Collision.js      ← Va chạm Circle, Box AABB, Soft push
-        │   ├── WaveManager.js    ← Điều phối Wave, độ khó tăng tiến
+        │   ├── WaveManager.js    ← Điều phối Wave, độ khó tăng tiến, kích hoạt Boss
         │   └── SpatialHash.js    ← Phân vùng không gian tối ưu 100+ zombie
         ├── world/
         │   ├── TileMap.js        ← Bản đồ đường phố đô thị
@@ -87,7 +94,7 @@ Game_Zombie/
 | **2** | ✅ | Combat gray-box — Bắn súng, Zombie đuổi, va chạm, sát thương, âm thanh synth |
 | **3** | ✅ | Vòng lặp lõi — Wave System, EXP Orbs, Coin, Level Up chọn 1 trong 3 Perk |
 | **4** | ✅ | Thế giới & Vật cản — TileMap đô thị, Chướng ngại vật Container/Crate, SpatialHash 100+ zombie |
-| **5** | ⏳ | AI nâng cao — Runner, Tank, Bomber, Spitter, Flanking tactics |
-| **6** | ⏳ | Kho vũ khí & Kỹ năng — Shotgun, SMG, Sniper, Dash, Lựu đạn |
-| **7** | ⏳ | Boss System — Trùm The Butcher ở Wave 5 |
-| **8–16** | ⏳ | Ánh sáng & bóng đổ, Web Audio BGM, Shop nâng cấp, Save/Load |
+| **5** | ✅ | AI nâng cao — 5 biến thể Zombie: Normal, Runner, Tank, Bomber, Spitter |
+| **6** | ✅ | Kho vũ khí & Kỹ năng — 4 Vũ khí (Pistol, Shotgun, SMG, Sniper), Dash [Space], Lựu đạn [Q] |
+| **7** | ✅ | Boss System (MỐC B) — Trùm The Butcher ở Wave 5 với Telegraph quét rìu & Lao húc |
+| **8–16** | ⏳ | Gói 2 & 3: Ánh sáng & bóng đổ, Web Audio BGM, Shop nâng cấp vĩnh viễn, Save/Load |

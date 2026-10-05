@@ -337,6 +337,180 @@ class SoundManager {
       osc.stop(noteTime + 0.25);
     });
   }
+
+  /** Tiếng súng Shotgun (Đại bác uy lực trầm đục) */
+  playShootShotgun() {
+    if (!this.enabled) return;
+    this._initContext();
+    if (!this._ctx) return;
+
+    const ctx = this._ctx;
+    const now = ctx.currentTime;
+
+    // Noise burst
+    const bufferSize = ctx.sampleRate * 0.14;
+    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+
+    const noise = ctx.createBufferSource();
+    noise.buffer = buffer;
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(2200, now);
+    filter.frequency.exponentialRampToValueAtTime(150, now + 0.14);
+
+    const gainNode = ctx.createGain();
+    gainNode.gain.setValueAtTime(0.55, now);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.14);
+
+    noise.connect(filter);
+    filter.connect(gainNode);
+    gainNode.connect(ctx.destination);
+    noise.start(now);
+    noise.stop(now + 0.14);
+
+    // Heavy bass thump
+    const osc = ctx.createOscillator();
+    const oscGain = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(180, now);
+    osc.frequency.exponentialRampToValueAtTime(25, now + 0.18);
+    oscGain.gain.setValueAtTime(0.5, now);
+    oscGain.gain.exponentialRampToValueAtTime(0.01, now + 0.18);
+    osc.connect(oscGain);
+    oscGain.connect(ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.18);
+  }
+
+  /** Tiếng súng tiểu liên SMG (Xả nhanh, đanh gọn) */
+  playShootSMG() {
+    if (!this.enabled) return;
+    this._initContext();
+    if (!this._ctx) return;
+
+    const ctx = this._ctx;
+    const now = ctx.currentTime;
+
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'square';
+    osc.frequency.setValueAtTime(500, now);
+    osc.frequency.exponentialRampToValueAtTime(80, now + 0.05);
+
+    gain.gain.setValueAtTime(0.25, now);
+    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.05);
+  }
+
+  /** Tiếng súng ngắm Sniper (Sấm sét xé toạc không gian) */
+  playShootSniper() {
+    if (!this.enabled) return;
+    this._initContext();
+    if (!this._ctx) return;
+
+    const ctx = this._ctx;
+    const now = ctx.currentTime;
+
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(800, now);
+    osc.frequency.exponentialRampToValueAtTime(40, now + 0.28);
+
+    gain.gain.setValueAtTime(0.6, now);
+    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.28);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.28);
+  }
+
+  /** Tiếng nổ lớn (Lựu đạn / Bomber nổ) */
+  playExplosion() {
+    if (!this.enabled) return;
+    this._initContext();
+    if (!this._ctx) return;
+
+    const ctx = this._ctx;
+    const now = ctx.currentTime;
+
+    const bufferSize = ctx.sampleRate * 0.45;
+    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+
+    const noise = ctx.createBufferSource();
+    noise.buffer = buffer;
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(800, now);
+    filter.frequency.linearRampToValueAtTime(60, now + 0.45);
+
+    const gainNode = ctx.createGain();
+    gainNode.gain.setValueAtTime(0.65, now);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.45);
+
+    noise.connect(filter);
+    filter.connect(gainNode);
+    gainNode.connect(ctx.destination);
+    noise.start(now);
+    noise.stop(now + 0.45);
+  }
+
+  /** Tiếng lướt Dash (Tiếng gió rít) */
+  playDash() {
+    if (!this.enabled) return;
+    this._initContext();
+    if (!this._ctx) return;
+
+    const ctx = this._ctx;
+    const now = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(350, now);
+    osc.frequency.exponentialRampToValueAtTime(900, now + 0.12);
+
+    gain.gain.setValueAtTime(0.28, now);
+    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.15);
+  }
+
+  /** Tiếng tiếng gầm của Trùm The Butcher */
+  playBossRoar() {
+    if (!this.enabled) return;
+    this._initContext();
+    if (!this._ctx) return;
+
+    const ctx = this._ctx;
+    const now = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(80, now);
+    osc.frequency.linearRampToValueAtTime(45, now + 0.6);
+
+    gain.gain.setValueAtTime(0.5, now);
+    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.6);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.6);
+  }
 }
 
 export const sound = new SoundManager();

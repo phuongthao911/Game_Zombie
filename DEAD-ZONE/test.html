@@ -582,6 +582,124 @@
         });
       });
 
+      return import('./js/data/weapons.js' + v);
+    }).then(({ WEAPONS }) => {
+
+      // ---- Weapons Tests (Phase 6) ----
+      suite('Weapons Arsenal (Phase 6)', () => {
+        test('has 4 distinct weapons with unique properties', () => {
+          assert(WEAPONS.PISTOL && WEAPONS.SHOTGUN && WEAPONS.SMG && WEAPONS.SNIPER);
+          assertEqual(WEAPONS.SHOTGUN.pellets, 6, 'Shotgun should fire 6 pellets');
+          assertEqual(WEAPONS.SNIPER.pierce, 999, 'Sniper should pierce all enemies');
+          assert(WEAPONS.SMG.fireRate < WEAPONS.PISTOL.fireRate, 'SMG should fire faster than Pistol');
+        });
+      });
+
+      return import('./js/entities/Grenade.js' + v);
+    }).then(({ Grenade }) => {
+
+      // ---- Grenade Skill Tests (Phase 6) ----
+      suite('Grenade Skill (Phase 6)', () => {
+        test('initializes and explodes when fuse expires', () => {
+          const g = new Grenade();
+          g.init(0, 0, 100, 0);
+          assertEqual(g.alive, true);
+          assert(g.vx > 0);
+
+          // Fast forward timer
+          g.fuseTimer = 0.05;
+          const exploded = g.update(0.1);
+          assertEqual(exploded, true, 'Grenade should explode when timer expires');
+          assertEqual(g.alive, false);
+        });
+      });
+
+      return import('./js/entities/AcidSpit.js' + v);
+    }).then(({ AcidSpit }) => {
+
+      // ---- AcidSpit Tests (Phase 5) ----
+      suite('AcidSpit Entity (Phase 5)', () => {
+        test('initializes and flies towards target', () => {
+          const a = new AcidSpit();
+          a.init(0, 0, 100, 0, 300, 15);
+          assertEqual(a.alive, true);
+          assertEqual(a.damage, 15);
+          a.update(0.1);
+          assert(a.x > 0);
+        });
+      });
+
+      return import('./js/entities/Zombie.js' + v);
+    }).then(({ Zombie }) => {
+
+      // ---- Zombie Variants Tests (Phase 5) ----
+      suite('Zombie Variants (Phase 5)', () => {
+        test('Runner has high speed and lower HP', () => {
+          const z = new Zombie();
+          z.init(0, 0, 85, 50, 10, 'RUNNER');
+          assertEqual(z.type, 'RUNNER');
+          assert(z.speed >= 120, 'Runner speed should be >= 120');
+          assert(z.hp < 50, 'Runner HP should be lower than Normal');
+        });
+
+        test('Tank has high HP and resists knockback', () => {
+          const z = new Zombie();
+          z.init(0, 0, 85, 50, 10, 'TANK');
+          assertEqual(z.type, 'TANK');
+          assert(z.hp > 150, 'Tank HP should be high');
+          assertEqual(z.radius, 24);
+        });
+
+        test('Bomber is initialized correctly', () => {
+          const z = new Zombie();
+          z.init(0, 0, 85, 50, 10, 'BOMBER');
+          assertEqual(z.type, 'BOMBER');
+          assertEqual(z.alive, true);
+        });
+
+        test('Spitter keeps distance and shoots spit', () => {
+          const z = new Zombie();
+          z.init(0, 0, 85, 50, 10, 'SPITTER');
+          assertEqual(z.type, 'SPITTER');
+          z.spitTimer = 0.05;
+          const action = z.update(0.1, 300, 0);
+          assertEqual(action.shouldSpit, true, 'Spitter should shoot acid when timer ready');
+        });
+      });
+
+      return import('./js/entities/Boss.js' + v);
+    }).then(({ Boss }) => {
+
+      // ---- Boss Tests (Phase 7) ----
+      suite('Boss The Butcher (Phase 7)', () => {
+        test('initializes with high HP and phase 1', () => {
+          const b = new Boss();
+          b.init(500, 500);
+          assertEqual(b.alive, true);
+          assertEqual(b.phase, 1);
+          assertEqual(b.maxHp, 1200);
+          assertEqual(b.hp, 1200);
+        });
+
+        test('enrages and enters phase 2 when HP drops below 50%', () => {
+          const b = new Boss();
+          b.init(500, 500);
+          b.takeDamage(700, 0, 0); // 1200 - 700 = 500 (< 50%)
+          assertEqual(b.hp, 500);
+          const res = b.update(0.1, 600, 500);
+          assertEqual(b.phase, 2, 'Boss should enter phase 2');
+          assertEqual(res.summonZombies, true, 'Boss should roar and summon helper zombies');
+        });
+
+        test('dies when HP drops to 0', () => {
+          const b = new Boss();
+          b.init(500, 500);
+          const killed = b.takeDamage(1300, 0, 0);
+          assertEqual(killed, true);
+          assertEqual(b.alive, false);
+        });
+      });
+
       // ================================================================
       // Render results
       // ================================================================
